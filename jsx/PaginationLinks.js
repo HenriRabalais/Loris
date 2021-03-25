@@ -1,113 +1,116 @@
 /* exported RPaginationLinks */
 
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React, {useState} from 'react';
 
-class PaginationLinks extends Component {
-  constructor(props) {
-    super(props);
+const theme = {
+  primary: '#053665',
+  secondary: '#A6D3F5',
+  accent: '#E89A0C',
+  neutral: '#DDD',
+};
 
-    this.state = {
+function PaginationNumber({
+  children,
+  active,
+  onClick,
+}) {
+  const [hover, setHover] = useState(false);
+  const hoverOn = () => setHover(true);
+  const hoverOff = () => setHover(false);
+  const style = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 30,
+    height: 30,
+    margin: '0px 2px',
+    background: onClick && hover && !active && theme.neutral,
+    border: active && '1px solid '+theme.primary,
+    borderRadius: '50%',
+    cursor: onClick && 'pointer',
+  };
 
-    };
-    this.changePage = this.changePage.bind(this);
+  return (
+    <div
+      style={style}
+      onClick={onClick}
+      onMouseOver={hoverOn}
+      onMouseOut={hoverOff}
+    >
+       {children}
+    </div>
+  );
+};
+
+function PaginationLinks({
+  rowsPerPage = 10,
+  total,
+  active = 1,
+  onChangePage,
+}) {
+  let pageLinks = [];
+  const lastPage = Math.ceil(total / rowsPerPage);
+  if (lastPage < active) {
+    onChangePage(1);
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.Total < prevProps.Total) {
-      this.props.onChangePage(1);
+  let startPage = 1;
+  let endPage = lastPage;
+  if (lastPage > 5) {
+    if (active - 2 > 1) {
+      startPage = active - 2;
+    }
+    if (active + 2 < lastPage) {
+      endPage = active + 2;
     }
   }
 
-  changePage(i) {
-    return function(evt) {
-      // Don't jump to the top of the page
-      evt.preventDefault();
-
-      if (this.props.onChangePage) {
-        this.props.onChangePage(i);
-      }
-    }.bind(this);
+  if (total === 0 || total < rowsPerPage || lastPage === 1) {
+    return null;
   }
 
-  render() {
-    let rowsPerPage = this.props.RowsPerPage;
-    let pageLinks = [];
-    let classList;
-    let lastPage = Math.ceil(this.props.Total / rowsPerPage);
-    let startPage = Math.max(1, this.props.Active - 3);
-    let lastShownPage = Math.min(this.props.Active + 3, lastPage);
-
-    if (this.props.Total === 0) {
-      return <div />;
-    }
-    if (this.props.Total < this.props.RowsPerPage) {
-      return <div />;
-    }
-
-    if ((lastShownPage - startPage) <= 7) {
-      lastShownPage = startPage + 6;
-      if (lastShownPage > lastPage) {
-        lastShownPage = lastPage;
-        startPage = lastPage - 6;
-      }
-    }
-
-    if (startPage > 1) {
-      pageLinks.push(
-        <li key={'table_page_beginning_' + startPage.toString()} onClick={this.changePage(1)}><a href='#'>&laquo;</a></li>
-      );
-    }
-    if (startPage < 1) {
-      startPage = 1;
-    }
-    if (lastShownPage < 1) {
-      lastShownPage = 1;
-    }
-
-        // If there is only 1 page, don't display pagination links
-    if (startPage === lastShownPage) {
-      return <div />;
-    }
-
-    for (let i = startPage; i <= lastShownPage; i += 1) {
-      classList = '';
-      if (this.props.Active === i) {
-        classList = 'active';
-      }
-      pageLinks.push(
-        <li key={'table_page_' + i.toString()} onClick={this.changePage(i)} className={classList}>
-          <a href="#">{i}</a>
-        </li>
-      );
-    }
-    if (lastShownPage !== lastPage) {
-      pageLinks.push(
-        <li key={'table_page_more_' + lastShownPage.toString()} onClick={this.changePage(lastPage)}>
-          <a href='#'>&raquo;</a>
-        </li>
-      );
-    }
-
-    return (
-      <ul className='pagination pagination-table'>
-          {pageLinks}
-      </ul>
-    );
+  if (active - 2 > 1) {
+    pageLinks = [
+      <PaginationNumber
+        key={startPage-1}
+        onClick={() => onChangePage(1)}
+      >
+        1
+      </PaginationNumber>,
+      <PaginationNumber key={'front_ellipsis'}>...</PaginationNumber>,
+    ];
   }
+
+  for (let i = startPage; i <= endPage; i += 1) {
+    pageLinks = [...pageLinks,
+      <PaginationNumber
+        key={i}
+        active={active === i}
+        onClick={() => onChangePage(i)}
+      >
+        {i}
+      </PaginationNumber>,
+    ];
+  }
+
+  if (active + 2 < lastPage) {
+    pageLinks = [...pageLinks,
+      <PaginationNumber key={'back_ellipsis'}>...</PaginationNumber>,
+      <PaginationNumber
+        key={endPage+1}
+        onClick={() => onChangePage(lastPage)}
+      >
+        {lastPage}
+      </PaginationNumber>,
+    ];
+  }
+
+  const paginationStyle = {
+    display: 'flex',
+    fontSize: 16,
+  };
+
+  return <div style={paginationStyle}>{pageLinks}</div>;
 }
-PaginationLinks.propTypes = {
-  onChangePage: PropTypes.func,
-  Total: PropTypes.number.isRequired,
-};
-PaginationLinks.defaultProps = {
-  RowsPerPage: 10,
-  Active: 1,
-};
-
-let RPaginationLinks = React.createFactory(PaginationLinks);
-
-window.PaginationLinks = PaginationLinks;
-window.RPaginationLinks = RPaginationLinks;
 
 export default PaginationLinks;

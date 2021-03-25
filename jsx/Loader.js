@@ -6,36 +6,52 @@
  *
  */
 
-import React, {Component} from 'react';
-import PropTypes from 'prop-types';
+import React from 'react';
 import LoadingBar from 'jsx/LoadingBar';
 
-/**
- * Loader component
- */
-class Loader extends Component {
-  render() {
-    const loaderStyle = {
-      width: parseInt(this.props.size),
-      height: parseInt(this.props.size),
-      borderWidth: parseInt(this.props.size)/15,
-    };
-    const progressBar = this.props.progress && (
-      <LoadingBar progress={this.props.progress}/>
-    );
-    return (
-      <div>
-        <div
-          className='loader'
-          style={loaderStyle}
-        />
-        {progressBar}
-      </div>
-    );
-  }
+function Loader({size = 120, progress = null}) {
+  const containerStyle = {
+    height: 'inherit',
+    width: 'inherit',
+    display: 'flex',
+  };
+  const loaderStyle = {
+    width: parseInt(size),
+    height: parseInt(size),
+    borderWidth: parseInt(size)/15,
+  };
+  const progressBar = progress && (
+    <LoadingBar progress={progress}/>
+  );
+  return (
+    <div style={containerStyle}>
+      <div
+        className='loader'
+        style={loaderStyle}
+      />
+      {progressBar}
+    </div>
+  );
 }
 
-Loader.propTypes = {size: PropTypes.string};
-Loader.defaultProps = {size: '120'};
+export function Saving({loading}) {
+  const containerStyle = {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  };
+  const style = {margin: '0 4px'};
+
+  return loading && (
+    <div style={containerStyle}>
+      <div style={style}>
+        <Loader size={20}/>
+      </div>
+      <div style={style}>
+        <h5 className='animate-flicker'>Saving...</h5>
+      </div>
+    </div>
+  );
+}
 
 export default Loader;

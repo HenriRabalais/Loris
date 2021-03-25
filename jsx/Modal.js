@@ -65,7 +65,7 @@ class Modal extends Component {
     };
 
     const bodyStyle = {
-      padding: success ? 0 : 15,
+      padding: success ? 0 : '15px 90px',
       maxHeight: success ? 0 : '75vh',
       overflow: 'scroll',
       opacity: success ? 0 : 1,
@@ -123,6 +123,7 @@ class Modal extends Component {
         const handleSubmit = () => {
           this.setState({loading: true},
             () => onSubmit()
+            .catch(() => Promise.reject(this.setState({loading: false})))
             .then(() => this.setState({loading: false, success: true},
               () => setTimeout(() => this.setState({success: false},
                 this.props.onClose), 2000)),
@@ -174,14 +175,16 @@ class Modal extends Component {
               ×
             </span>
           </div>
-          <div style={bodyStyle}>
-            {renderChildren()}
-          </div>
-          <div style={footerStyle}>
-            {loader}
-            {successDisplay}
-            {submitButton()}
-          </div>
+          <FormElement>
+            <div style={bodyStyle}>
+              {renderChildren()}
+            </div>
+            <div style={footerStyle}>
+              {loader}
+              {successDisplay}
+              {submitButton()}
+            </div>
+          </FormElement>
         </div>
       </div>
     );

@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -9,24 +9,30 @@ import PropTypes from 'prop-types';
  *
  * Alters the filter object and sends it to parent on every update.
  *
+ * @param {object} props
+ * @return {jsx}
  */
-class Filter extends Component {
-  constructor(props) {
-    super(props);
-    this.onFieldUpdate = this.onFieldUpdate.bind(this);
-    this.renderFilterFields = this.renderFilterFields.bind(this);
-  }
+function Filter(props) {
+  const {
+    filter = {},
+    fields = [],
+    updateFilter,
+    id,
+    name,
+    title,
+    clearFilter,
+    filterPresets,
+  } = props;
 
-  componentDidMount() {
+  useEffect(() => {
      const searchParams = new URLSearchParams(location.search);
-     const filter = JSON.parse(JSON.stringify(this.props.filter));
      searchParams.forEach((value, name) => {
-       if (this.props.fields.find((field) => (field.filter||{}).name == name)) {
+       if (fields.find((field) => (field.filter||{}).name == name)) {
          filter[name] = {value: searchParams.getAll(name)};
        }
      });
-     this.props.updateFilter(filter);
-   }
+     updateFilter(filter);
+  }, []);
 
   /**
    * Sets filter object to reflect values of input fields.
@@ -36,98 +42,112 @@ class Filter extends Component {
    * @param {string} id - id of the form element
    * @param {string} type - type of the form element
    */
-  onFieldUpdate(name, value, id, type) {
-    const searchParams = new URLSearchParams(location.search);
-    const filter = JSON.parse(JSON.stringify(this.props.filter));
+  const onFieldUpdate = (name, value, id, type) => {
+    const newFilter = JSON.parse(JSON.stringify(filter));
     const exactMatch = (!(type === 'textbox' || type === 'date'));
-    if (value === null || value === '' || (value.constructor === Array && value.length === 0)) {
-      delete filter[name];
-      searchParams.delete(name);
+    if (
+      value === null
+      || value === ''
+      || (value.constructor === Array && value.length === 0)
+    ) {
+      delete newFilter[name];
     } else {
-      if (value.constructor === Array) {
-        searchParams.delete(name);
-        value.forEach((v) => searchParams.append(name, v));
-      } else {
-        searchParams.set(name, value);
-      }
-      filter[name] = {value, exactMatch};
+      newFilter[name] = {value, exactMatch};
     }
-    this.props.updateFilter(filter);
-    history.replaceState(filter, '', `?${searchParams.toString()}`);
-  }
+    updateFilter(newFilter);
+  };
 
-  renderFilterFields() {
-    return this.props.fields.reduce((result, field) => {
-      const filter = field.filter;
-      if (filter && filter.hide !== true) {
-        let element;
-        switch (filter.type) {
-        case 'text':
-          element = <TextboxElement key={filter.name}/>;
-          break;
-        case 'select':
-          element = <SelectElement key={filter.name} options={filter.options}/>;
-          break;
-        case 'multiselect':
-          element = <SelectElement key={filter.name} options={filter.options} multiple={true} emptyOption={false}/>;
-          break;
-        case 'date':
-          element = <DateElement key={filter.name}/>;
-          break;
-        case 'checkbox':
-          element = <CheckboxElement key={filter.name}/>;
-          break;
-        default:
-          element = <TextboxElement key={filter.name}/>;
-        }
+  const FilterPresets = () => {
+    if (!filterPresets) {
+      return null;
+    };
 
-        // The value prop has to default to false if the first two options
-        // are undefined so that the checkbox component is a controlled input
-        // element with a starting default value
-        result.push(React.cloneElement(
-          element,
-          {
-            name: filter.name,
-            label: field.label,
-            value: (this.props.filter[filter.name] || {}).value || false,
-            onUserInput: this.onFieldUpdate,
-          }
-        ));
-      }
-
-      return result;
-    }, []);
-  }
-
-  render() {
+    const presets = filterPresets.map((preset) => {
+      const handleClick = () => updateFilter(preset.filter);
+      return <li><a onClick={handleClick}>{preset.label}</a></li>;
+    });
     return (
-      <FormElement
-        id={this.props.id}
-        name={this.props.name}
-      >
-        <FieldsetElement
-          columns={this.props.columns}
-          legend={this.props.title}
+      <li className='dropdown'>
+        <a
+          className='dropdown-toggle'
+          data-toggle='dropdown'
+          role='button'
         >
-          {this.renderFilterFields()}
-          <ButtonElement
-            label="Clear Filters"
-            type="reset"
-            onUserInput={this.props.clearFilter}
-          />
-        </FieldsetElement>
-      </FormElement>
+          Load Filter Preset <span className='caret'/>
+        </a>
+        <ul className='dropdown-menu' role='menu'>
+          {presets}
+        </ul>
+      </li>
     );
-  }
+  };
+
+  const filterFields = () => {
+    return fields.map((field) => {
+      if (field.filter && (field.filter.hide !== true)) {
+        const passedProps = {
+          key: field.filter.name,
+          name: field.filter.name,
+          label: field.label,
+          value: (filter[field.filter.name] || {}).value || false,
+          autoSelect: false,
+          onUserInput: onFieldUpdate,
+        };
+        switch (field.filter.type) {
+        case 'text':
+          return <TextboxElement {...passedProps}/>;
+        case 'select':
+          return (
+            <SelectElement
+              {...passedProps}
+              options={field.filter.options}
+              sortByValue={field.filter.sortByValue}
+            />
+          );
+        case 'multiselect':
+          return (
+            <SelectElement
+              {...passedProps}
+              options={field.filter.options}
+              multiple={true}
+              emptyOption={false}
+            />
+          );
+        case 'numeric':
+          return <NumericElement {...passedProps} options={field.filter.options}/>;
+        case 'date':
+          return <DateElement {...passedProps}/>;
+        case 'checkbox':
+          return <CheckboxElement {...passedProps}/>;
+        default:
+          return null;
+        }
+      }
+    }, []);
+  };
+
+  return (
+    <FormElement
+      id={id}
+      name={name}
+    >
+      <FieldsetElement
+        legend={title}
+      >
+        <ul className='nav nav-tabs navbar-right' style={{borderBottom: 'none'}}>
+          <FilterPresets/>
+          <li>
+            <a role='button' name='reset' onClick={clearFilter}>
+              Clear Filter
+            </a>
+          </li>
+        </ul>
+        {filterFields()}
+      </FieldsetElement>
+    </FormElement>
+  );
 }
 
-Filter.defaultProps = {
-  id: null,
-  clearFilter: function() {
-    console.warn('onUpdate() callback is not set!');
-  },
-  columns: 1,
-};
 Filter.propTypes = {
   filter: PropTypes.object.isRequired,
   clearFilter: PropTypes.func.isRequired,
