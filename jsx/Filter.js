@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
-import PropTypes from 'prop-types';
+import {SimplePanel} from './Panel';
+import {DropMenu} from './Icons';
 
 /**
  * Filter component.
@@ -12,18 +13,13 @@ import PropTypes from 'prop-types';
  * @param {object} props
  * @return {jsx}
  */
-function Filter(props) {
-  const {
-    filter = {},
-    fields = [],
-    updateFilter,
-    id,
-    name,
-    title,
-    clearFilter,
-    filterPresets,
-  } = props;
-
+function Filter({
+  filter = {},
+  fields = [],
+  updateFilter,
+  clearFilter,
+  filterPresets,
+}) {
   useEffect(() => {
      const searchParams = new URLSearchParams(location.search);
      searchParams.forEach((value, name) => {
@@ -64,22 +60,9 @@ function Filter(props) {
 
     const presets = filterPresets.map((preset) => {
       const handleClick = () => updateFilter(preset.filter);
-      return <li><a onClick={handleClick}>{preset.label}</a></li>;
+      return <div><a onClick={handleClick}>{preset.label}</a></div>;
     });
-    return (
-      <li className='dropdown'>
-        <a
-          className='dropdown-toggle'
-          data-toggle='dropdown'
-          role='button'
-        >
-          Load Filter Preset <span className='caret'/>
-        </a>
-        <ul className='dropdown-menu' role='menu'>
-          {presets}
-        </ul>
-      </li>
-    );
+    return <DropMenu>{presets}</DropMenu>;
   };
 
   const filterFields = () => {
@@ -127,35 +110,14 @@ function Filter(props) {
   };
 
   return (
-    <FormElement
-      id={id}
-      name={name}
-    >
-      <FieldsetElement
-        legend={title}
-      >
-        <ul className='nav nav-tabs navbar-right' style={{borderBottom: 'none'}}>
-          <FilterPresets/>
-          <li>
-            <a role='button' name='reset' onClick={clearFilter}>
-              Clear Filter
-            </a>
-          </li>
-        </ul>
-        {filterFields()}
-      </FieldsetElement>
-    </FormElement>
+    <SimplePanel>
+      <FilterPresets/>
+      <FormElement>{filterFields()}</FormElement>
+      <a role='button' name='reset' onClick={clearFilter}>
+        Clear Filter
+      </a>
+    </SimplePanel>
   );
 }
-
-Filter.propTypes = {
-  filter: PropTypes.object.isRequired,
-  clearFilter: PropTypes.func.isRequired,
-  id: PropTypes.string,
-  name: PropTypes.string,
-  columns: PropTypes.string,
-  title: PropTypes.string,
-  fields: PropTypes.object.isRequired,
-};
 
 export default Filter;

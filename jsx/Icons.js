@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
 
+const theme = {
+  primary: '#053665',
+  secondary: '#A6D3F5',
+  accent: '#E89A0C',
+  neutral: '#DDD',
+};
+
 export function Pencil({onClick}) {
   return onClick instanceof Function && (
     <span
@@ -71,26 +78,65 @@ export function ActionButton({title, onClick, icon = 'chevron-right'}) {
   );
 }
 
+function ToolTip({children, show}) {
+  if (!show) return null;
+  const styleTool = {
+    width: '200px',
+    height: '400px',
+    zIndex: 3,
+    borderRadius: 2,
+    backgroundColor: 'white',
+    boxShadow: 'rgb(15 15 15 / 19%) 1px 8px 13px 5px',
+    position: 'absolute',
+  };
+  return (
+    <div style={styleTool}>{children}</div>
+  );
+};
+
+export function DropMenu({children, title}) {
+  const [hover, setHover] = useState(false);
+  const [show, setShow] = useState(false);
+  const hoverOn = () => setHover(true);
+  const hoverOff = () => setHover(false);
+
+  const style = {
+    display: 'flex',
+    alignItems: 'center',
+    margin: '0px 2px',
+    borderRadius: '2px',
+    padding: '2px',
+    background: hover && theme.neutral,
+    cursor: 'pointer',
+  };
+
+  const onClick = (e) => {
+    setShow(true);
+    console.log(e.clientX);
+    console.log(e.clientY);
+  };
+  return (
+    <>
+      <div
+        style={style}
+        onClick={onClick}
+        onMouseOver={hoverOn}
+        onMouseOut={hoverOff}
+      >
+        Load Preset
+        <span className={'glyphicon glyphicon-chevron-down'}/>
+      </div>
+      <ToolTip show={show}>{children}</ToolTip>
+    </>
+  );
+}
+
 export function Options(props) {
     const [show, setShow] = useState(false);
     const onClick = (e) => {
       setShow(true);
       console.log(e.clientX);
       console.log(e.clientY);
-    };
-    const ToolTip = ({show}) => {
-      if (!show) return null;
-      const styleTool = {
-        width: '200px',
-        height: '400px',
-        zIndex: 3,
-        backgroundColor: 'white',
-        boxShadow: 'rgb(15 15 15 / 5%) 0px 0px 0px 1px, rgb(15 15 15 / 10%) 0px 3px 6px, rgb(15 15 15 / 20%) 0px 9px 24px',
-        position: 'absolute',
-      };
-      return (
-        <div style={styleTool}/>
-      );
     };
     return (
       <>

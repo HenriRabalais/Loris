@@ -20,7 +20,6 @@ import LoadingBar from 'jsx/LoadingBar';
  * @return {jsx}
  */
 function FilterableDataTable(props) {
-  const [filter, setFilter] = useState({});
   const {
     children,
     name,
@@ -31,8 +30,9 @@ function FilterableDataTable(props) {
     getMappedCell,
     folder,
     loading,
-    filterPresets,
   } = props;
+  const [filter, setFilter] = useState({});
+  const filterPresets = [{label: 'First Preset!', filter: {pendingNew: {value: ['N'], exactMatch: true}}}];
 
   /**
    * Updates filter state

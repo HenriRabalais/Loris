@@ -9,6 +9,12 @@ const theme = {
   neutral: '#DDD',
 };
 
+/**
+ * @param {jsx} children
+ * @param {bool} active
+ * @param {func} onClick
+ * @return {jsx}
+ */
 function PaginationNumber({
   children,
   active,
@@ -42,14 +48,21 @@ function PaginationNumber({
   );
 };
 
+/**
+ * @param {int} rowsPerPage
+ * @param {int} total
+ * @param {bool} active
+ * @param {func} onChangePage
+ * @return {jsx}
+ */
 function PaginationLinks({
   rowsPerPage = 10,
   total,
-  active = 1,
+  active,
   onChangePage,
 }) {
   let pageLinks = [];
-  const lastPage = Math.ceil(total / rowsPerPage);
+  const lastPage = Math.ceil(total / rowsPerPage) || 1;
   if (lastPage < active) {
     onChangePage(1);
   }
@@ -72,7 +85,7 @@ function PaginationLinks({
   if (active - 2 > 1) {
     pageLinks = [
       <PaginationNumber
-        key={startPage-1}
+        key={1}
         onClick={() => onChangePage(1)}
       >
         1
@@ -97,7 +110,7 @@ function PaginationLinks({
     pageLinks = [...pageLinks,
       <PaginationNumber key={'back_ellipsis'}>...</PaginationNumber>,
       <PaginationNumber
-        key={endPage+1}
+        key={lastPage}
         onClick={() => onChangePage(lastPage)}
       >
         {lastPage}

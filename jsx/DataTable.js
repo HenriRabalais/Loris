@@ -135,21 +135,22 @@ function DataTable({
     );
   };
 
+  const rowsPerPageDropdown = (
+    <select
+      className="input-sm perPage"
+      onChange={updatePageRows}
+      value={page.rows}
+    >
+      <option>20</option>
+      <option>50</option>
+      <option>100</option>
+      <option>1000</option>
+      <option>5000</option>
+      <option>10000</option>
+    </select>
+  );
+
   const HeaderBlock = (props) => {
-    const rowsPerPageDropdown = (
-      <select
-        className="input-sm perPage"
-        onChange={updatePageRows}
-        value={page.rows}
-      >
-        <option>20</option>
-        <option>50</option>
-        <option>100</option>
-        <option>1000</option>
-        <option>5000</option>
-        <option>10000</option>
-      </select>
-    );
     const headerStyle = {
       display: 'flex',
       justifyContent: 'space-between',
