@@ -100,8 +100,6 @@ export function Panels({height = 500, children, grow}) {
 
 export function SimplePanel({
   flex = 1,
-  minWidth = 200,
-  minHeight = 700,
   title,
   edit,
   children,
@@ -134,10 +132,15 @@ export function SimplePanel({
     );
   };
 
-  const style = {
-    flex,
-    minWidth,
-    minHeight,
+  const Body = ({children}) => {
+    const style = {
+      padding: '10px 25px',
+      overflow: 'auto',
+    };
+    return <div style={style}>{children}</div>;
+  };
+
+  const panelStyle = {
     border: '1px solid ' + (hover ? '#A6D3F5' : '#DDD'),
     borderRadius: '10px',
     margin: '10px',
@@ -146,12 +149,12 @@ export function SimplePanel({
 
   return (
     <div
-      style={style}
+      style={panelStyle}
       onMouseOver={hoverOn}
       onMouseOut={hoverOff}
     >
       <Header title={title} edit={edit}/>
-      <div style={{padding: '10px 25px'}}>{children}</div>
+      <Body>{children}</Body>
     </div>
   );
 }
