@@ -6,14 +6,15 @@
  *
  */
 
-import React, {Component} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
+import {Pencil, Node} from './Icons';
 
 /**
  * Panel component
  * Wraps children in a collapsible bootstrap panel
  */
-class Panel extends Component {
+class Panel extends React.Component {
   constructor(props) {
     super(props);
 
@@ -80,5 +81,86 @@ Panel.defaultProps = {
   id: 'default-panel',
   height: '100%',
 };
+
+export function Panels({height = 500, children, grow}) {
+  const style = {
+    display: 'flex',
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'stretch',
+    minHeight: height,
+  };
+
+  const panels = React.Children.map(children, (child, i) => {
+    return <SimplePanel grow={grow[i]}>{child}</SimplePanel>;
+  });
+
+  return <div style={style}>{panels}</div>;
+}
+
+export function SimplePanel({
+  children,
+  height,
+  title,
+  edit,
+}) {
+  // const [hover, setHover] = useState(false);
+  // const hoverOn = () => setHover(true);
+  // const hoverOff = () => setHover(false);
+
+  const Header = ({title = null, edit}) => {
+    const style = {
+      display: 'flex',
+      alignItems: 'center',
+      padding: '10px',
+      backgroundColor: '#E4EBF2',
+      borderTopLeftRadius: '10px',
+      borderTopRightRadius: '10px',
+      borderBottom: '1px solid #DDD',
+    };
+    if (!title) {
+      return null;
+    }
+    return (
+    <>
+      <div style={style}>
+        <Node title={title.charAt(0).toUpperCase()}/>
+        <div style={{fontSize: 24}}>{title}</div>
+        <Pencil onClick={edit}/>
+      </div>
+    </>
+    );
+  };
+
+  const Body = ({children}) => {
+    const style = {
+      height: '100%',
+      overflow: 'auto',
+      padding: '10px 25px',
+    };
+    return <div style={style}>{children}</div>;
+  };
+
+  // border: '1px solid ' + (hover ? '#A6D3F5' : '#DDD'),
+  const panelStyle = {
+    height: height+'em',
+    border: '1px solid #DDD',
+    borderRadius: '10px',
+    margin: '10px',
+    boxShadow: 'rgb(0 0 0 / 13%) 1px 7px 11px 2px',
+  };
+
+  // onMouseOver={hoverOn}
+  // onMouseOut={hoverOff}
+
+  return (
+    <div
+      style={panelStyle}
+    >
+      <Header title={title} edit={edit}/>
+      <Body>{children}</Body>
+    </div>
+  );
+}
 
 export default Panel;

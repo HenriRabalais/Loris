@@ -795,8 +795,6 @@ a.list-group-item:focus {
 /* Loader customizations */
 
 .loader {
-    position: relative;
-    top: 50%;
     transform: translateY(-50%);
     margin: auto;
     border: 8px solid #FFFFFF; /* White */

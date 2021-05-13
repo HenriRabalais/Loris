@@ -35,9 +35,9 @@ class BadRequest extends JsonResponse
      *
      * @param string $msg The error message
      */
-    public function __construct(string $msg = 'bad request')
+    public function __construct(string $msg = 'bad request', array $errors)
     {
-        $body = array('error' => $msg);
+        $body = array('error' => $msg, 'errors' => $errors);
         parent::__construct($body, 400);
     }
 }
