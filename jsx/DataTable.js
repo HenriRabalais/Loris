@@ -36,6 +36,7 @@ const Header = ({children, onClick}) => {
  * @param {function} getMappedCell
  * @param {function} getFormattedCell
  * @param {array} actions
+ * @param {array} forms
  * @param {jsx} folder
  *
  * @return {jsx}
@@ -47,11 +48,16 @@ function DataTable({
   getMappedCell,
   getFormattedCell,
   actions,
+  forms,
   folder,
 }) {
   const [page, setPage] = useState({number: 1, rows: 20});
   const columns = fields;
-  const dataHand = new useData(data, columns, filter);
+  let dataHand = new useData(data, columns, filter);
+  useEffect(() => {
+    console.log(data);
+    dataHand.updateData(data);
+  }, [data]);
   useEffect(() => {
     dataHand.filterData(filter);
   }, [filter]);
@@ -80,6 +86,14 @@ function DataTable({
             />
           );
         }
+      });
+    }
+  };
+
+  const renderForms = () => {
+    if (forms) {
+      return forms.map((form, key) => {
+        return <div key={key}>{form}</div>;
       });
     }
   };
@@ -166,6 +180,7 @@ function DataTable({
         <div style={headerStyle}>
           <div style={actionStyle}>
             {renderActions()}
+            {renderForms()}
             <ActionButton
               title="Download"
               onClick={dataHand.download}
@@ -202,6 +217,10 @@ function useData(initData = [], initColumns = []) {
   const [columns] = useState(initColumns);
 
   this.getData = () => data;
+  this.updateData = (data) => {
+    setRawData(data);
+    setData(data);
+  };
   this.setMapper = (mapper) => this.mapper = mapper;
 
   this.filterData = (filters) => {

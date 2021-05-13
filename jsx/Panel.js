@@ -6,7 +6,7 @@
  *
  */
 
-import React, {useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import {Pencil, Node} from './Icons';
 
@@ -99,14 +99,14 @@ export function Panels({height = 500, children, grow}) {
 }
 
 export function SimplePanel({
-  flex = 1,
+  children,
+  height,
   title,
   edit,
-  children,
 }) {
-  const [hover, setHover] = useState(false);
-  const hoverOn = () => setHover(true);
-  const hoverOff = () => setHover(false);
+  // const [hover, setHover] = useState(false);
+  // const hoverOn = () => setHover(true);
+  // const hoverOff = () => setHover(false);
 
   const Header = ({title = null, edit}) => {
     const style = {
@@ -134,24 +134,28 @@ export function SimplePanel({
 
   const Body = ({children}) => {
     const style = {
-      padding: '10px 25px',
+      height: '100%',
       overflow: 'auto',
+      padding: '10px 25px',
     };
     return <div style={style}>{children}</div>;
   };
 
+  // border: '1px solid ' + (hover ? '#A6D3F5' : '#DDD'),
   const panelStyle = {
-    border: '1px solid ' + (hover ? '#A6D3F5' : '#DDD'),
+    height: height+'em',
+    border: '1px solid #DDD',
     borderRadius: '10px',
     margin: '10px',
     boxShadow: 'rgb(0 0 0 / 13%) 1px 7px 11px 2px',
   };
 
+  // onMouseOver={hoverOn}
+  // onMouseOut={hoverOff}
+
   return (
     <div
       style={panelStyle}
-      onMouseOver={hoverOn}
-      onMouseOut={hoverOff}
     >
       <Header title={title} edit={edit}/>
       <Body>{children}</Body>

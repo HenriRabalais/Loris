@@ -58,9 +58,9 @@ function Filter({
       return null;
     };
 
-    const presets = filterPresets.map((preset) => {
+    const presets = filterPresets.map((preset, i) => {
       const handleClick = () => updateFilter(preset.filter);
-      return <div><a onClick={handleClick}>{preset.label}</a></div>;
+      return <div key={i}><a onClick={handleClick}>{preset.label}</a></div>;
     });
     return <DropMenu>{presets}</DropMenu>;
   };

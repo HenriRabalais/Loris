@@ -26,6 +26,7 @@ function FilterableDataTable(props) {
     data,
     fields,
     actions,
+    forms,
     getFormattedCell,
     getMappedCell,
     folder,
@@ -101,6 +102,7 @@ function FilterableDataTable(props) {
       fields={fields}
       filter={filters}
       actions={actions}
+      forms={forms}
       getFormattedCell={getFormattedCell}
       getMappedCell={getMappedCell}
       folder={folder}
