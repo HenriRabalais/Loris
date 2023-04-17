@@ -32,6 +32,7 @@ const resolve = {
     FilterForm: path.resolve(__dirname, './jsx/FilterForm'),
     Form: path.resolve(__dirname, './jsx/Form'),
     Loader: path.resolve(__dirname, './jsx/Loader'),
+    LoadingBar: path.resolve(__dirname, './jsx/LoadingBar'),
     Markdown: path.resolve(__dirname, './jsx/Markdown'),
     Modal: path.resolve(__dirname, './jsx/Modal'),
     MultiSelectDropdown: path.resolve(__dirname, './jsx/MultiSelectDropdown'),
@@ -143,7 +144,7 @@ let mode = 'production';
 try {
   const configFile = fs.readFileSync('project/config.xml', 'latin1');
   const res = /<[\s]*?sandbox[\s]*?>(.*)<\/[\s]*?sandbox[\s]*?>/
-              .exec(configFile);
+    .exec(configFile);
   if (res && parseInt(res[1]) == 1) mode = 'development';
 } catch (error) {
   console.error(
