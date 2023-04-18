@@ -144,7 +144,7 @@ let mode = 'production';
 try {
   const configFile = fs.readFileSync('project/config.xml', 'latin1');
   const res = /<[\s]*?sandbox[\s]*?>(.*)<\/[\s]*?sandbox[\s]*?>/
-    .exec(configFile);
+              .exec(configFile);
   if (res && parseInt(res[1]) == 1) mode = 'development';
 } catch (error) {
   console.error(
