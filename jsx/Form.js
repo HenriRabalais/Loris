@@ -1841,7 +1841,6 @@ class TimeElement extends Component {
 
     // Add error message
     // ########### CBIGR START ###########
-    // ########### CBIGR START ###########
     if (this.props.errorMessage || (required && this.props.value === '')) {
       errorMessage = (
         <span>{this.props.errorMessage || 'The field is required!'}</span>
