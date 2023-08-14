@@ -32,25 +32,25 @@ namespace LORIS\Data\Filters;
  * @license    http://www.gnu.org/licenses/gpl-3.0.txt GPLv3
  * @link       https://www.github.com/aces/Loris/
  */
-class UserProjectOrSiteMatch implements \LORIS\Data\Filter                      
-{                                                                               
-    /**                                                                         
-     * Implements the \LORIS\Data\Filter interface                              
-     *                                                                          
+class UserProjectOrSiteMatch implements \LORIS\Data\Filter
+{
+    /**
+     * Implements the \LORIS\Data\Filter interface
+     *
      * @param \User                    $user     The user that the data is being
-     *                                           filtered for.                  
-     * @param \LORIS\Data\DataInstance $resource The data being filtered.       
-     *                                                                          
-     * @return bool true if the user has a project or site in common with the   
-     *              data                                                        
-     */                                                                         
+     *                                           filtered for.
+     * @param \LORIS\Data\DataInstance $resource The data being filtered.
+     *
+     * @return bool true if the user has a project or site in common with the
+     *              data
+     */
     public function filter(\User $user, \Loris\Data\DataInstance $resource) : bool
-    {                                                                        
-        $siteMatch = (new \LORIS\Data\Filters\UserSiteMatch())
-          ->filter($user, $resource);                                           
+    {
+        $siteMatch    = (new \LORIS\Data\Filters\UserSiteMatch())
+          ->filter($user, $resource);
         $projectMatch = (new \LORIS\Data\Filters\UserProjectMatch())
           ->filter($user, $resource);
-                                                                             
-        return $siteMatch || $projectMatch;                                     
-    }                                                                           
-}    
+
+        return $siteMatch || $projectMatch;
+    }
+}
