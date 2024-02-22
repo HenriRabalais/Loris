@@ -1124,6 +1124,11 @@ class TextboxElement extends Component {
    */
   constructor(props) {
     super(props);
+// ########### CBIGR START ###########
+    this.state = {
+      isTouched: false,
+    };
+// ###########  CBIGR END  ###########
     this.handleChange = this.handleChange.bind(this);
     this.handleBlur = this.handleBlur.bind(this);
   }
@@ -1147,6 +1152,9 @@ class TextboxElement extends Component {
    * @param {object} e - Event
    */
   handleBlur(e) {
+// ########### CBIGR START ###########
+    this.setState({isTouched: true});
+// ###########  CBIGR END  ###########
     this.props.onUserBlur(this.props.name, e.target.value);
   }
 
@@ -1171,7 +1179,10 @@ class TextboxElement extends Component {
 
     // Add error message
     // ########### CBIGR START ###########
-    if (this.props.errorMessage || (required && this.props.value === '')) {
+    if (this.state.isTouched && (
+         this.props.errorMessage ||
+         (required && this.props.value === '')
+    )) {
       errorMessage = (
         <span>{this.props.errorMessage || 'The field is required!'}</span>
       );
