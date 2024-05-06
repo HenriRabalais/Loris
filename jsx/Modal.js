@@ -147,7 +147,7 @@ function Modal({
       };
       return (
         <div style={submitStyle}>
-          <Button
+          <ButtonElement
             label="Submit"
             onClick={submit}
           />
@@ -191,7 +191,7 @@ function Modal({
             ×
           </span>
         </div>
-        <FormElement>
+        <div>
           <div style={bodyStyle}>
             {renderChildren()}
           </div>
@@ -200,7 +200,7 @@ function Modal({
             {successDisplay}
             {submitButton()}
           </div>
-        </FormElement>
+        </div>
       </div>
     </div>
   );

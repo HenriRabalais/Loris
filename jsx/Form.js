@@ -10,9 +10,7 @@ CheckboxElement, ButtonElement, LorisElement
  * @version 1.0.0
  *
  */
-// ########### CBIGR START ###########
-import React, {useState, Component} from 'react';
-// ###########  CBIGR END  ###########
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 
 /**
@@ -1551,7 +1549,7 @@ PasswordElement.defaultProps = {
  * Date Component
  * React wrapper for a <input type="date"> element.
  */
-class DateElement extends Component {
+export class DateElement extends Component {
   /**
    * @constructor
    * @param {object} props - React Component properties
@@ -1559,63 +1557,22 @@ class DateElement extends Component {
   constructor(props) {
     super(props);
     this.handleChange = this.handleChange.bind(this);
-    // ########### CBIGR START ###########
-    this.handleButton = this.handleButton.bind(this);
-    // ###########  CBIGR END  ###########
   }
 
   /**
    * Called by React when the component has been rendered on the page.
    */
   componentDidMount() {
-    if (!Modernizr.inputtypes.month) {
-      // Check if props minYear and maxYear are valid values if supplied
-      let minYear = this.props.minYear;
-      let maxYear = this.props.maxYear;
-      if (this.props.minYear === '' || this.props.minYear === null) {
-        minYear = '1000';
-      }
-      if (this.props.maxYear === '' || this.props.maxYear === null) {
-        maxYear = '9999';
-      }
-      let monthInputs = $('input[type=month][name=' + this.props.name+']');
-      monthInputs.datepicker({
-        dateFormat: 'yy-mm',
-        changeMonth: true,
-        changeYear: true,
-        yearRange: minYear + ':' + maxYear,
-        constrainInput: true,
-        onChangeMonthYear: (y, m, d) => {
-          // Update date in the input field
-          $(this).datepicker('setDate', new Date(y, m - 1, d.selectedDay));
-        },
-        onSelect: (dateText, picker) => {
-          this.props.onUserInput(this.props.name, dateText);
-        },
-      });
-      monthInputs.attr('placeholder', 'yyyy-mm');
-      monthInputs.on('keydown paste', (e) => {
-        e.preventDefault();
-      });
-    }
+    // Check if props minYear and maxYear are valid values if supplied
+    // let minYear = this.props.minYear;
+    // let maxYear = this.props.maxYear;
+    // if (this.props.minYear === '' || this.props.minYear === null) {
+    //   minYear = '1000';
+    // }
+    // if (this.props.maxYear === '' || this.props.maxYear === null) {
+    //   maxYear = '9999';
+    // }
   }
-
-  // ########### CBIGR START ###########
-  /**
-   * Handle change
-   *
-   * @param {object} e - Event
-   */
-  handleButton(e) {
-    let date = new Date();
-    let dateString = new Date(
-      date.getTime() - (date.getTimezoneOffset() * 60000)
-    )
-      .toISOString()
-      .split('T')[0];
-    this.props.onUserInput(this.props.name, dateString);
-  }
-  // ###########  CBIGR END  ###########
 
   /**
    * Handle change
@@ -1641,9 +1598,7 @@ class DateElement extends Component {
     let required = this.props.required ? 'required' : null;
     let requiredHTML = null;
     let errorMessage = null;
-    // ########### CBIGR START ###########
-    let elementClass = this.props.noMargins ? '' : 'row form-group';
-    // ###########  CBIGR END  ###########
+    let elementClass = 'row form-group';
 
     // Add required asterix
     if (required) {
@@ -1651,14 +1606,12 @@ class DateElement extends Component {
     }
 
     // Add error message
-    // ########### CBIGR START ###########
-    if (this.props.errorMessage || (required && this.props.value === '')) {
-      errorMessage = (
-        <span>{this.props.errorMessage || 'The field is required!'}</span>
-      );
-      elementClass += ' has-error';
+    if (this.props.hasError
+       || (this.props.required && this.props.value === '')
+    ) {
+      errorMessage = <span>{this.props.errorMessage}</span>;
+      elementClass = elementClass + ' has-error';
     }
-    // ###########  CBIGR END  ###########
 
     // Check if props minYear and maxYear are valid values if supplied
     let minYear = this.props.minYear;
@@ -1689,57 +1642,37 @@ class DateElement extends Component {
       maxFullDate = maxYear + '-' + currentMonth;
     }
 
-    // ########### CBIGR START ###########
-    const todayButton = this.props.today && (
-      <Button
-        label='Today'
-        type="button"
-        onClick={this.handleButton}
-      />
-    );
-
-    // Label prop needs to be provided to render label
-    // (including empty label i.e. <SelectElement label='' />)
-    // and retain formatting. If label prop is not provided at all, the input
-    // element will take up the whole row.
-    let label = null;
-    let inputClass = this.props.noMargins ? '' : 'col-sm-12';
-    if (this.props.label && this.props.label != '') {
-      label = (
-        <label className="col-sm-3 control-label" htmlFor={this.props.id}>
+    let labelHTML;
+    let classSz = 'col-sm-12';
+    if (this.props.label) {
+        labelHTML = <label
+            className="col-sm-3 control-label"
+            htmlFor={this.props.label}>
           {this.props.label}
           {requiredHTML}
-        </label>
-      );
-      inputClass = 'col-sm-9';
+        </label>;
+        classSz = 'col-sm-9';
     }
-
     return (
       <div className={elementClass}>
-        {label}
-        <div className={inputClass}>
-          <InlineField weights={[1, 0]}>
-            <>
-              <input
-                type={inputType}
-                className="form-control"
-                name={this.props.name}
-                id={this.props.id}
-                min={minFullDate}
-                max={maxFullDate}
-                onChange={this.handleChange}
-                value={this.props.value || ''}
-                required={required}
-                disabled={disabled}
-              />
-              {errorMessage}
-            </>
-            {todayButton}
-          </InlineField>
+        {labelHTML}
+        <div className={classSz}>
+          <input
+            type={inputType}
+            className="form-control"
+            name={this.props.name}
+            id={this.props.id}
+            min={minFullDate}
+            max={maxFullDate}
+            onChange={this.handleChange}
+            value={this.props.value || ''}
+            required={required}
+            disabled={disabled}
+          />
+          {errorMessage}
         </div>
       </div>
     );
-    // ###########  CBIGR END  ###########
   }
 }
 
@@ -1748,8 +1681,8 @@ DateElement.propTypes = {
   label: PropTypes.string,
   value: PropTypes.string,
   id: PropTypes.string,
-  maxYear: PropTypes.string,
-  minYear: PropTypes.string,
+  maxYear: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  minYear: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   dateFormat: PropTypes.string,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
@@ -1759,20 +1692,17 @@ DateElement.propTypes = {
 };
 
 DateElement.defaultProps = {
-  // ########### CBIGR START ###########
   name: '',
   label: '',
-  value: null,
+  value: undefined,
   id: null,
-  maxYear: '9999-12-31',
-  minYear: '1000-01-01',
-  today: true,
-  // ###########  CBIGR END  ###########
+  maxYear: '9999',
+  minYear: '1000',
   dateFormat: 'YMd',
   disabled: false,
   required: false,
   hasError: false,
-  errorMessage: null,
+  errorMessage: 'The field is required!',
   onUserInput: function() {
     console.warn('onUserInput() callback is not set');
   },
@@ -1782,7 +1712,7 @@ DateElement.defaultProps = {
  * Time Component
  * React wrapper for a <input type="time"> element.
  */
-class TimeElement extends Component {
+export class TimeElement extends Component {
   /**
    * @constructor
    * @param {object} props - React Component properties
@@ -1791,9 +1721,6 @@ class TimeElement extends Component {
     super(props);
 
     this.handleChange = this.handleChange.bind(this);
-    // ########### CBIGR START ###########
-    this.handleButton = this.handleButton.bind(this);
-    // ###########  CBIGR END  ###########
   }
 
   /**
@@ -1805,21 +1732,6 @@ class TimeElement extends Component {
     this.props.onUserInput(this.props.name, e.target.value);
   }
 
-  // ########### CBIGR START ###########
-  /**
-   * Handle change
-   *
-   * @param {object} e - Event
-   */
-  handleButton(e) {
-    let date = new Date();
-    const hours = date.getHours();
-    const minutes = date.getMinutes();
-    const timeString = ('0'+hours).slice(-2)+':'+('0'+minutes).slice(-2);
-    this.props.onUserInput(this.props.name, timeString);
-  }
-  // ###########  CBIGR END  ###########
-
   /**
    * Renders the React component.
    *
@@ -1829,74 +1741,44 @@ class TimeElement extends Component {
     let disabled = this.props.disabled ? 'disabled' : null;
     let required = this.props.required ? 'required' : null;
     let requiredHTML = null;
-    // ########### CBIGR START ###########
-    let errorMessage = null;
-    let elementClass = this.props.noMargins ? '' : 'row form-group';
-    // ###########  CBIGR END  ###########
+    let label;
+    let classSz;
 
     // Add required asterix
     if (required) {
       requiredHTML = <span className="text-danger">*</span>;
     }
-
-    // Add error message
-    // ########### CBIGR START ###########
-    if (this.props.errorMessage || (required && this.props.value === '')) {
-      errorMessage = (
-        <span>{this.props.errorMessage || 'The field is required!'}</span>
-      );
-      elementClass += ' has-error';
-    }
-    // ###########  CBIGR END  ###########
-
-    // Label prop needs to be provided to render label
-    // (including empty label i.e. <SelectElement label='' />)
-    // and retain formatting. If label prop is not provided at all, the input
-    // element will take up the whole row.
-    let label = null;
-    let inputClass = this.props.noMargins ? '' : 'col-sm-12';
-    if (this.props.label && this.props.label != '') {
-      label = (
-        <label className="col-sm-3 control-label" htmlFor={this.props.id}>
+    if (this.props.label) {
+        label = <label className="col-sm-3 control-label"
+            htmlFor={this.props.label}>
           {this.props.label}
           {requiredHTML}
-        </label>
-      );
-      inputClass = 'col-sm-9';
+            </label>;
+        classSz = 'col-sm-9';
+    } else {
+        classSz = 'col-sm-12';
     }
-    // ###########  CBIGR END  ###########
 
     return (
-      <div className={elementClass}>
+      <div className="row form-group">
         {label}
-        <div className={inputClass}>
-          <InlineField weights={[1, 0]}>
-            <>
-              <input
-              type="time"
-              className="form-control"
-              name={this.props.name}
-              id={this.props.id}
-              onChange={this.handleChange}
-              value={this.props.value || ''}
-              required={required}
-              disabled={disabled}
-              pattern="([0-1][0-9]|2[0-4]|[1-9]):([0-5][0-9])?"
-              title="Input must be in one of the following formats: HH:MM or
-              HH:MM:SS"
-              />
-              {errorMessage}
-            </>
-            <Button
-            label="Now"
-            type="button"
-            onClick={this.handleButton}
-            />
-          </InlineField>
+        <div className={classSz}>
+          <input
+            type="time"
+            className="form-control"
+            name={this.props.name}
+            id={this.props.id}
+            onChange={this.handleChange}
+            value={this.props.value || ''}
+            required={required}
+            disabled={disabled}
+            pattern="([0-1][0-9]|2[0-4]|[1-9]):([0-5][0-9])(:([0-5][0-9]))?"
+            title={'Input must be in one of the following formats: '
+                  + 'HH:MM or HH:MM:SS'}
+          />
         </div>
       </div>
     );
-  // ###########  CBIGR END  ###########
   }
 }
 
@@ -1910,19 +1792,17 @@ TimeElement.propTypes = {
   onUserInput: PropTypes.func,
 };
 
-// ########### CBIGR START ###########
 TimeElement.defaultProps = {
   name: '',
   label: '',
-  value: null,
-  id: null,
+  value: '',
+  id: '',
   disabled: false,
   required: false,
   onUserInput: function() {
     console.warn('onUserInput() callback is not set');
   },
 };
-// ###########  CBIGR END  ###########
 
 /**
  * Numeric Component
@@ -2109,17 +1989,13 @@ class FileElement extends Component {
     };
 
     // Add error message
-    // ########### CBIGR START ###########
-    if (this.props.errorMessage || (required && this.props.value === '')) {
-      errorMessage = (
-        <span>{this.props.errorMessage || 'The field is required!'}</span>
-      );
-      elementClass += ' has-error';
+    if (this.props.hasError) {
+      errorMessage = this.props.errorMessage;
+      elementClass = 'row form-group has-error';
     }
-    // ###########  CBIGR END  ###########
 
     // Need to manually reset file value, because HTML API
-    // does not allow setting value to anything than empty string.
+   // does not allow setting value to anything than empty string.
     // Hence can't use value attribute in the input element.
     const fileHTML = document.querySelector('.fileUpload');
     if (fileHTML && !fileName) {
@@ -2177,7 +2053,6 @@ class FileElement extends Component {
     );
   }
 }
-
 FileElement.propTypes = {
   name: PropTypes.string.isRequired,
   label: PropTypes.string,
@@ -2188,26 +2063,26 @@ FileElement.propTypes = {
   id: PropTypes.string,
   disabled: PropTypes.bool,
   required: PropTypes.bool,
+  allowMultiple: PropTypes.bool,
   hasError: PropTypes.bool,
   errorMessage: PropTypes.string,
   onUserInput: PropTypes.func,
 };
 
-// ########### CBIGR START ###########
 FileElement.defaultProps = {
   name: '',
   label: 'File to Upload',
-  value: null,
+  value: '',
   id: null,
   disabled: false,
   required: false,
+  allowMultiple: false,
   hasError: false,
-  errorMessage: null,
+  errorMessage: 'The field is required!',
   onUserInput: function() {
     console.warn('onUserInput() callback is not set');
   },
 };
-// ###########  CBIGR END  ###########
 
 /**
  * Static element component.
@@ -2491,7 +2366,6 @@ class ButtonElement extends Component {
     this.props.onUserInput(e);
   }
 
-  // ########### CBIGR START ###########
   /**
    * Renders the React component.
    *
@@ -2501,39 +2375,22 @@ class ButtonElement extends Component {
     return (
       <div className="row form-group">
         <div className={this.props.columnSize}>
-          <Button
+                <button
             id={this.props.id}
             name={this.props.name}
-            label={this.props.label}
             type={this.props.type}
             className={this.props.buttonClass}
             style={this.props.style}
             onClick={this.handleClick}
             disabled={this.props.disabled}
-          />
+          >
+            {this.props.disabled ? 'Uploading...' : this.props.label}
+          </button>
         </div>
       </div>
     );
   }
 }
-
-/**
- * Button
- *
- * @param {object} props - properties passed to button
- * @return {JSX} - React markup for the component
- */
-function Button(props) {
-  return (
-    <button
-      className={'btn btn-primary'}
-      {...props}
-    >
-      {props.label}
-    </button>
-  );
-}
-// ###########  CBIGR END  ###########
 
 ButtonElement.propTypes = {
   id: PropTypes.string,
@@ -2985,154 +2842,6 @@ SliderElement.defaultProps = {
   },
 };
 
-// ########### CBIGR START ###########
-/**
- * Form Header
- *
- * @return {JSX}
- */
-function FormHeader({level = 4, header = ''}) {
-  const Tag = 'h' + level;
-  return (
-    <>
-      <Tag>{header}</Tag>
-      <HorizontalRule/>
-    </>
-  );
-}
-
-/**
- * Horizontal Rule
- *
- * @return {JSX}
- */
-function HorizontalRule() {
-  const lineStyle = {
-    borderTop: '1.5px solid #DDDDDD',
-    paddingTop: 15,
-    marginTop: 0,
-  };
-  return <div style={lineStyle}/>;
-}
-
-/**
- * Input List
- *
- * @return {JSX}
- */
-function InputList({
-                     name,
-                     label,
-                     items,
-                     setItems,
-                     errorMessage,
-                     options,
-                   }) {
-  const [item, setItem] = useState('');
-
-  const removeItem = (index) => setItems(items.filter((item, i) => index != i));
-  const addItem = () => {
-    const match = Object.keys(options)
-      .find((key) => options[key][name] == item);
-    // if entry is in list of options and does not already exist in the list.
-    if (match && !items.includes(match)) {
-      setItems([...items, match]);
-      setItem('');
-    }
-  };
-
-  const listStyle = {
-    border: '1px solid #DDD',
-    borderRadius: '10px',
-    minHeight: '85px',
-    padding: '5px',
-    marginBottom: '15px',
-    display: 'flex',
-    flexDirection: 'column',
-  };
-
-  const listItemStyle = {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'flex-start',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  };
-
-  const itemsDisplay = items.map((item, i) => {
-    const style = {
-      color: '#DDDDDD',
-      marginLeft: 10,
-      cursor: 'pointer',
-    };
-    return (
-      <div key={i} style={listItemStyle}>
-        <div>{options[item][name]}</div>
-        <div
-          className='glyphicon glyphicon-remove'
-          onClick={() => removeItem(i)}
-          style={style}
-        />
-      </div>
-    );
-  });
-
-  const error = errorMessage instanceof Array ?
-    errorMessage.join(' ') : errorMessage;
-  return (
-    <div style={{display: 'flex', justifyContent: 'space-between'}}>
-      <div style={{flex: '0.47'}}>
-        <FormHeader header={label + ' Input'}/>
-        <InlineField weights={[1, 0]}>
-          <TextboxElement
-            name={name}
-            onUserInput={(name, value) => setItem(value)}
-            value={item}
-            errorMessage={error}
-          />
-          <Button
-            label='Add'
-            onClick={addItem}
-          />
-        </InlineField>
-      </div>
-      <div style={{flex: '0.47'}}>
-        <FormHeader header={label + ' List'}/>
-        <div style={listStyle}>
-          {itemsDisplay}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/**
- * Inline Field
- *
- * @return {JSX}
- */
-function InlineField({children, label = '', weights = []}) {
-  const fields = React.Children.map(children, (child, i) => {
-    return (
-      <div style={{flex: weights[i] || 0}}>
-        {child}
-      </div>
-    );
-  });
-
-  const inlineStyle = {
-    display: 'flex',
-    flexFlow: 'row',
-    justifyContent: 'spaceBetween',
-  };
-  return (
-    <div style={inlineStyle}>
-      {fields}
-    </div>
-  );
-}
-// ###########  CBIGR END  ###########
-
 window.FormElement = FormElement;
 window.FieldsetElement = FieldsetElement;
 window.SelectElement = SelectElement;
@@ -3155,12 +2864,6 @@ window.RadioElement = RadioElement;
 window.ButtonElement = ButtonElement;
 window.CTA = CTA;
 window.LorisElement = LorisElement;
-// ########### CBIGR START ###########
-window.Button = Button;
-window.FormHeader = FormHeader;
-window.HorizontalRule = HorizontalRule;
-window.InputList = InputList;
-// ###########  CBIGR END  ###########
 
 export default {
   FormElement,
