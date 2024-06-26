@@ -142,8 +142,14 @@ case 'DICOMTAR':
     $PatientName      = $_GET['patientName'] ?? '';
     break;
 case 'csv':
-    // Biospecimens files
-    if(strpos($File, 'Open-Summary') !== false){
+    if(strpos($File, 'IPSC-Open-Summary') !== false){
+        // IPSC
+        $FullPath         = '/cbigr_prod_ro/ipsc/summary/' . basename($File);
+        $MimeType         = 'text/csv';
+        $DownloadFilename = basename($File);
+        break;
+    } elseif(strpos($File, 'Open-Summary') !== false){
+        //Biospecimen
         $FullPath         = '/cbigr_prod_ro/biospecimens/' . basename($File);
         $MimeType         = 'text/csv';
         $DownloadFilename = basename($File);
