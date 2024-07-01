@@ -13,7 +13,7 @@ class DataTable extends Component {
     this.state = {
       page: {
         number: 1,
-        rows: 20,
+        rows: 500,
       },
       sort: {
        column: -1,
@@ -463,6 +463,7 @@ class DataTable extends Component {
         <option>20</option>
         <option>50</option>
         <option>100</option>
+        <option>500</option>
         <option>1000</option>
         <option>5000</option>
         <option>10000</option>
