@@ -20,7 +20,7 @@ CREATE TABLE `biobank_container_dimension` (
   `Z` int(10) unsigned NOT NULL,
   `ZNumerical` tinyint(1) DEFAULT NULL,
   PRIMARY KEY (`ContainerDimensionID`),
-  UNIQUE KEY `UK_biobank_container_dimension_X_Y_Z` (`X`,`Y`,`Z`)
+  UNIQUE KEY `UK_biobank_container_dimension_X_Y_Z` (`X`,`XNumerical`, `Y`, `YNumerical`, `Z`, `ZNumerical`)
 ) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Table structure for table `biobank_container_capacity`
