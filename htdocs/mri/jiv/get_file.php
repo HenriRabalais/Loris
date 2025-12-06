@@ -143,15 +143,21 @@ case 'DICOMTAR':
     break;
 case 'csv':
     $sharedBase = $config->getSetting('sharedDataDrive');
-    if(strpos($File, 'IPSC-Open-Summary') !== false){
+    if(strpos($File, '_IPSC_Summary') !== false){
         // IPSC
-        $FullPath         = $sharedBase . 'ipsc/summary/' . basename($File);
+        $FullPath         = $sharedBase . 'dqt/ipsc/' . basename($File);
         $MimeType         = 'text/csv';
         $DownloadFilename = basename($File);
         break;
-    } elseif(strpos($File, 'Open-Summary') !== false){
+    } elseif(strpos($File, '_Specimen_Summary') !== false){
         //Biospecimen
-        $FullPath         = $sharedBase . 'biospecimens/' . basename($File);
+        $FullPath         = $sharedBase . 'dqt/biospecimens/' . basename($File);
+        $MimeType         = 'text/csv';
+        $DownloadFilename = basename($File);
+        break;
+    } elseif(strpos($File, '_Genomics_Summary') !== false){
+        //Biospecimen
+        $FullPath         = $sharedBase . 'dqt/genomics/' . basename($File);
         $MimeType         = 'text/csv';
         $DownloadFilename = basename($File);
         break;
