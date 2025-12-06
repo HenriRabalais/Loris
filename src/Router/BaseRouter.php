@@ -73,7 +73,7 @@ class BaseRouter extends PrefixRouter implements RequestHandlerInterface
                 if ($this->user->getUsername() === 'openuser') {
                     $modulename='open_dqt';
                 } else {
-                    $modulename = "dqt";
+                    $modulename = "registered_dqt";
                 }
             }
             $request = $request->withURI($uri->withPath("/"));
