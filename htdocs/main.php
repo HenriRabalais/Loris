@@ -78,7 +78,14 @@ $baseURL = $settings->getBaseURL();
 $tpl_data['baseurl'] = $baseURL;
 
 // study title
-$tpl_data['study_title'] = $config->getSetting('title');
+$lang = strtoupper($_REQUEST['lang'] ?? 'EN');
+
+if ($lang === 'FR') {
+    $tpl_data['study_title']
+        = 'Portail de données de la Biobanque ouverte du Neuro (C-BIG)';
+} else {
+    $tpl_data['study_title'] = $config->getSetting('title');
+}
 
 if (!$anonymous) {
     tplFromRequest('candID');
