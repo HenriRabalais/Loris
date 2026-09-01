@@ -257,8 +257,6 @@ const DataTable = ({
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
-        window.URL.revokeObjectURL(dataURL); // Cleanup memory
-        csvworker.terminate();
       }
     });
 
@@ -343,7 +341,7 @@ const DataTable = ({
       }
 
       const isString = (typeof val === 'string' || val instanceof String);
-      const isNumber = !isNaN(parseFloat(val)) && isFinite(val);
+      const isNumber = !isNaN(val) && typeof val !== 'object';
 
       if (val === '.') {
         val = null;
@@ -390,7 +388,8 @@ const DataTable = ({
     if (!noDynamicTable) {
       $('.dynamictable').DynamicTable();
     }
-  }, [noDynamicTable]);
+    // Runs once when the table is first rendered.
+  }, []);
 
   /**
    * Renders the Actions buttons.
@@ -442,6 +441,11 @@ const DataTable = ({
     padding: '5px 0',
     marginLeft: 'auto',
   };
+  const footerActionsStyle = {
+    order: '2',
+    padding: '5px 0',
+    marginLeft: 'auto',
+  };
   const renderTableControls = (showActions) => (
     <div className="row">
       <div style={tableControlStyle}>
@@ -464,9 +468,9 @@ const DataTable = ({
             )
           </span>
         </div>
-        <div style={tableActionsStyle}>
+        <div style={showActions ? tableActionsStyle : footerActionsStyle}>
           {showActions && renderActions()}
-          {showActions && !hide.downloadCSV && (
+          {showActions && hide.downloadCSV !== true && (
             <button
               className="btn btn-primary"
               onClick={() => downloadCSV(filteredRowIndexes)}
@@ -506,7 +510,7 @@ const DataTable = ({
 
   return (
     <div style={{margin: '14px'}}>
-      {!hide.rowsPerPage && (
+      {hide.rowsPerPage !== true && (
         <div className="table-header">
           {renderTableControls(true)}
         </div>
@@ -518,7 +522,7 @@ const DataTable = ({
       >
         <thead>
           <tr className="info">
-            {!hide.defaultColumn && (
+            {hide.defaultColumn !== true && (
               <th
                 key='th_col_0'
                 onClick={() => setSortColumn(-1)}
@@ -527,11 +531,11 @@ const DataTable = ({
               </th>
             )}
             {fields.map((field, i) => {
-              if (!field.show) return null;
+              if (field.show !== true) return null;
               return (
                 <th
                   key={`th_col_${i+1}`}
-                  id={field.freezeColumn ? freezeColumn : undefined}
+                  id={field.freezeColumn === true ? freezeColumn : undefined}
                   onClick={() => setSortColumn(i)}
                 >
                   {field.label}
@@ -552,9 +556,11 @@ const DataTable = ({
 
             return (
               <tr key={`tr_${item.RowIdx}`}>
-                {!hide.defaultColumn && <td>{item.Content}</td>}
+                {hide.defaultColumn !== true && (
+                  <td key={`td_${item.RowIdx}`}>{item.Content}</td>
+                )}
                 {fields.map((field, j) => {
-                  if (!field.show) return null;
+                  if (field.show === false) return null;
 
                   if (getFormattedCell) {
                     const cell = getFormattedCell(
@@ -580,7 +586,7 @@ const DataTable = ({
         </tbody>
       </table>
 
-      <div className="table-footer">{renderTableControls(false)}</div>
+      <div>{renderTableControls(false)}</div>
     </div>
   );
 };
