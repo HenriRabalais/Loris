@@ -557,15 +557,20 @@ const DataTable = ({
                   if (!field.show) return null;
 
                   if (getFormattedCell) {
-                    return React.cloneElement(
-                      getFormattedCell(
-                        field.label, rowData[j],
-                        rowObj,
-                        fieldLabels,
-                        j
-                      ),
-                      {key: `td_col_${j}`}
+                    const cell = getFormattedCell(
+                      field.label, rowData[j],
+                      rowObj,
+                      fieldLabels,
+                      j
                     );
+                    if (cell === null) {
+                      return (
+                        <React.Fragment key={`td_col_${j}`}>
+                          {rowData[j]}
+                        </React.Fragment>
+                      );
+                    }
+                    return React.cloneElement(cell, {key: `td_col_${j}`});
                   }
                   return <td key={`td_col_${j}`}>{rowData[j]}</td>;
                 })}
