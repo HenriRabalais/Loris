@@ -256,7 +256,9 @@ function isAPIQueryCriteriaGroup(
  * @param {object} query - the json object
  * @returns {QueryGroup} - The object converted into a QueryGroup
  */
-function unserializeSavedQuery(query: APIQueryCriteriaGroup): QueryGroup {
+export function unserializeSavedQuery(
+  query: APIQueryCriteriaGroup,
+): QueryGroup {
   if (!query.operator) {
     throw new Error('Invalid query tree');
   }

@@ -1,6 +1,6 @@
 import {createRoot} from 'react-dom/client';
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 
 import Welcome from './welcome';
 import DefineFilters from './definefilters';
@@ -12,7 +12,11 @@ import NextSteps from './nextsteps';
 import useBreadcrumbs from './hooks/usebreadcrumbs';
 import useVisits from './hooks/usevisits';
 import useQuery from './hooks/usequery';
-import {useSharedQueries, useLoadQueryFromURL} from './hooks/usesharedqueries';
+import {
+  useSharedQueries,
+  useLoadQueryFromURL,
+  unserializeSavedQuery,
+} from './hooks/usesharedqueries';
 import {useDataDictionary, useCategories} from './hooks/usedatadictionary';
 import {ModuleDictionary, DictionaryCategory} from './types';
 // @ts-ignore
@@ -106,6 +110,44 @@ function DataQueryApp(props: {
   ] = useQuery();
 
   useLoadQueryFromURL(loadQuery);
+
+  // ########### CBIG START ############
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const queryId = params.get('queryId');
+    if (!queryId) {
+      return;
+    }
+
+    fetch(`/dataquery/queries/${queryId}`, {
+      method: 'GET',
+      credentials: 'same-origin',
+    })
+      .then((resp) => {
+        if (!resp.ok) {
+          throw new Error('Invalid response');
+        }
+        return resp.json();
+      })
+      .then(async (result) => {
+        const fields = result.Query?.fields ?? [];
+        const criteria = result.Query?.criteria
+          ? unserializeSavedQuery(result.Query.criteria)
+          : null;
+        const modules = new Set<string>(
+          fields.map((f: {module: string}) => f.module),
+        );
+        await Promise.all(
+          Array.from(modules).map((m) => fetchModuleDictionary(m)),
+        );
+        loadQuery(fields, criteria);
+        setActiveTab('ViewData');
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  }, []);
+  // ########### CBIG END ###########
 
   const {t} = props;
   if (!categories) {
