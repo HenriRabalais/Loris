@@ -292,13 +292,24 @@ function unserializeSavedQuery(query: APIQueryCriteriaGroup): QueryGroup {
   return root;
 }
 
+const VALID_VIEWS: {[key: string]: string} = {
+  welcome: 'Info',
+  fields: 'DefineFields',
+  filters: 'DefineFilters',
+  data: 'ViewData',
+};
+
 /**
  * React hook to load a query if one was passed in the URL.
  *
  * @param {function} loadQuery - function to load the query into React state
+ * @param {function} fetchModuleDictionary - optional function to preload module dictionaries
+ * @param {function} setActiveTab - optional function to switch the active view
  */
 function useLoadQueryFromURL(
-  loadQuery: (fields: APIQueryField[], filters: QueryGroup|null) => void
+  loadQuery: (fields: APIQueryField[], filters: QueryGroup|null) => void,
+  fetchModuleDictionary?: (module: string) => Promise<any>,
+  setActiveTab?: (tab: string) => void
 ) {
   // Load query if queryID was passed
   useEffect(() => {
@@ -307,6 +318,11 @@ function useLoadQueryFromURL(
     if (!queryID) {
       return;
     }
+    const viewParam = params.get('view');
+    const targetView = viewParam
+      ? VALID_VIEWS[viewParam.toLowerCase()] ?? null
+      : null;
+
     fetch(
       '/dataquery/queries/' + queryID,
       {
@@ -318,18 +334,30 @@ function useLoadQueryFromURL(
         throw new Error('Invalid response');
       }
       return resp.json();
-    }).then((result) => {
-      if (result.Query.criteria) {
-        result.Query.criteria = unserializeSavedQuery(
-          result.Query.criteria
+    }).then(async (result) => {
+      const fields: APIQueryField[] = result.Query?.fields ?? [];
+      const criteria = result.Query?.criteria
+        ? unserializeSavedQuery(result.Query.criteria)
+        : null;
+      if (targetView === 'ViewData' && fetchModuleDictionary) {
+        const modules = new Set<string>(
+          fields.map((f: APIQueryField) => f.module),
+        );
+        await Promise.all(
+          Array.from(modules).map((m) => fetchModuleDictionary(m)),
         );
       }
-      loadQuery(result.Query.fields, result.Query.criteria);
-      swal.fire({
-        type: 'success',
-        text: 'Loaded query',
-      });
-    }).catch( (error) => {
+      loadQuery(fields, criteria);
+      if (targetView && setActiveTab) {
+        setActiveTab(targetView);
+      }
+      if (targetView !== 'ViewData') {
+        swal.fire({
+          type: 'success',
+          text: 'Loaded query',
+        });
+      }
+    }).catch((error) => {
       swal.fire({
         type: 'error',
         text: 'Could not load query',

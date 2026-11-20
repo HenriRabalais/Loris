@@ -105,7 +105,7 @@ function DataQueryApp(props: {
     criteriaActions,
   ] = useQuery();
 
-  useLoadQueryFromURL(loadQuery);
+  useLoadQueryFromURL(loadQuery, fetchModuleDictionary, setActiveTab);
 
   const {t} = props;
   if (!categories) {
